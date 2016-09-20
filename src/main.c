@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 	GtkBuilder* b = gtk_builder_new_from_string
 		(ui_glade_xml,ui_glade_xml_length);
 	GtkWidget* top = GTK_WIDGET(gtk_builder_get_object(b,"top"));
-	const char* strtime;
+	const char* strtime = NULL;
 	const char* timeformat = "%k:%m";
 	void new_hour(struct tm *curtime_tm) {
 		char buf[0x100];
@@ -73,12 +73,6 @@ int main(int argc, char *argv[])
 		gtk_window_resize(GTK_WINDOW(top), width, height);
 	}
 
-	cairo_surface_t* surface = gdk_window_create_similar_surface
-		(gtk_widget_get_window (widget),
-		 CAIRO_CONTENT_COLOR,
-		 gtk_widget_get_allocated_width (widget),
-		 gtk_widget_get_allocated_height (widget));
-	
 	cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
 	cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_BOLD;
 	int size = 18;
@@ -102,18 +96,19 @@ int main(int argc, char *argv[])
                gpointer      user_data) {
 		size_to_font(cairo);
 
+		cairo_set_source_rgba(cairo,1,0,1,1);
+		cairo_rectangle(cairo,0,0,
+										te.height+MARGIN*2,
+										te.width+te.x_bearing+MARGIN*2);
+		cairo_stroke(cairo);
+
+		
 		cairo_matrix_t tf;
 		{
 			cairo_matrix_init_translate(&tf, MARGIN,MARGIN);
 			cairo_matrix_rotate(&tf, M_PI / 2);
 		}
 		cairo_transform(cairo, &tf);
-
-		cairo_set_source_rgba(cairo,1,0,1,1);
-		cairo_rectangle(cairo,0,0,
-										te.height+MARGIN*2,
-										te.width+te.x_bearing+MARGIN*2);
-		cairo_stroke(cairo);
 
 		cairo_set_source_rgba(cairo, 0,1,1,1);
     cairo_move_to (cairo,0,0);
@@ -130,7 +125,13 @@ int main(int argc, char *argv[])
 		return G_SOURCE_CONTINUE;
 	}
 	// set the initial size...
-	size_to_font(gdk_cairo_create(gtk_widget_get_window(top)));
+	gulong firstmap;
+	void on_map(void) {
+		gettime();
+		size_to_font(gdk_cairo_create(gtk_widget_get_window(top)));
+		g_signal_handler_disconnect(top,firstmap);
+	}
+	firstmap = g_signal_connect(top,"realize",on_map,NULL);
 	
 	g_timeout_add(100,update_clock,NULL);
 
