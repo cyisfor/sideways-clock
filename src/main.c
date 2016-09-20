@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 		(ui_glade_xml,ui_glade_xml_length);
 	GtkWidget* top = GTK_WIDGET(gtk_builder_get_object(b,"top"));
 	const char* strtime = NULL;
-	const char* timeformat = "%k:%m";
+	const char* timeformat = "%k:%M";
 	void new_hour(struct tm *curtime_tm) {
 		char buf[0x100];
 		strftime(buf,0x100,"%a %l %P",curtime_tm);
@@ -140,7 +140,7 @@ int main(int argc, char *argv[])
 	}
 	firstmap = g_signal_connect(top,"realize",on_map,NULL);
 	
-	g_timeout_add(100,update_clock,NULL);
+	g_timeout_add(60*1000-1,update_clock,NULL);
 
 	g_signal_connect(top,"destroy",gtk_main_quit,NULL);
 	g_signal_connect(top,"screen-changed", G_CALLBACK(screen_changed), NULL);
