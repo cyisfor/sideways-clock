@@ -96,6 +96,11 @@ int main(int argc, char *argv[])
                gpointer      user_data) {
 		size_to_font(cairo);
 
+		cairo_set_source_rgba(cairo,0,0,0,0);
+		cairo_rectangle(cairo,0,0,
+										te.height+MARGIN*2,
+										te.width+te.x_bearing+MARGIN*2);
+		cairo_fill(cairo);
 		cairo_set_source_rgba(cairo,1,0,1,1);
 		cairo_rectangle(cairo,0,0,
 										te.height+MARGIN*2,
