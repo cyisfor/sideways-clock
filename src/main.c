@@ -83,6 +83,9 @@ int main(int argc, char *argv[])
 		cairo_rectangle(cairo,0,0,
 										te.height+MARGIN*2,
 										te.width+te.x_bearing+MARGIN*2);
+		gtk_window_resize(GTK_WINDOW(top),
+			 te.height + MARGIN*2,
+			 te.width + te.x_bearing + MARGIN*2);
 
 
 		cairo_stroke(cairo);
@@ -91,9 +94,6 @@ int main(int argc, char *argv[])
 			cairo_matrix_init_translate(&tf, MARGIN,MARGIN);
 			cairo_matrix_rotate(&tf, M_PI / 2);
 		}
-		/* gtk_window_resize(GTK_WINDOW(top),
-			 te.height - te.y_bearing + MARGIN,
-			 te.width - te.x_bearing + MARGIN); */
 		cairo_transform(cairo, &tf);
 
 		cairo_set_source_rgba(cairo,1,0,1,1);
