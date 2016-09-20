@@ -1,5 +1,5 @@
-CFLAGS+=-g -Igen `pkg-config --cflags gtk+-3.0 cairo`
-LDFLAGS+=-g `pkg-config --libs gtk+-3.0 cairo` -lm
+CFLAGS+=-O2 -Igen `pkg-config --cflags gtk+-3.0 cairo`
+LDFLAGS+=-O2 `pkg-config --libs gtk+-3.0 cairo` -lm
 
 main: main.o
 

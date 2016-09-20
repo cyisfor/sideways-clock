@@ -72,38 +72,48 @@ int main(int argc, char *argv[])
 		old_width = width;
 		gtk_window_resize(GTK_WINDOW(top), width, height);
 	}
+
+	cairo_surface_t* surface = gdk_window_create_similar_surface
+		(gtk_widget_get_window (widget),
+		 CAIRO_CONTENT_COLOR,
+		 gtk_widget_get_allocated_width (widget),
+		 gtk_widget_get_allocated_height (widget));
+	
 	cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
 	cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_BOLD;
 	int size = 18;
 	cairo_text_extents_t te;
-	double angle = 0;
-#define RADIUS 50
-	gboolean draw_it(GtkWidget    *widget,
-               cairo_t *cairo,
-               gpointer      user_data) {
+
+	void size_to_font(cairo_t* cairo) {
 		cairo_select_font_face(cairo,
 			 "serif",
 			 slant,
 			 weight);
 		cairo_set_font_size(cairo,size);
 		cairo_text_extents (cairo, strtime, &te);
-		cairo_set_source_rgba(cairo,1,0,1,1);
-		cairo_rectangle(cairo,0,0,
-										te.height+MARGIN*2,
-										te.width+te.x_bearing+MARGIN*2);
 		// note the height of the text is the width of the window.
 		maybe_resize(
 			 te.height + MARGIN*2,
 			 te.width + te.x_bearing + MARGIN*2);
+	}
 
+	gboolean draw_it(GtkWidget    *widget,
+               cairo_t *cairo,
+               gpointer      user_data) {
+		size_to_font(cairo);
 
-		cairo_stroke(cairo);
 		cairo_matrix_t tf;
 		{
 			cairo_matrix_init_translate(&tf, MARGIN,MARGIN);
 			cairo_matrix_rotate(&tf, M_PI / 2);
 		}
 		cairo_transform(cairo, &tf);
+
+		cairo_set_source_rgba(cairo,1,0,1,1);
+		cairo_rectangle(cairo,0,0,
+										te.height+MARGIN*2,
+										te.width+te.x_bearing+MARGIN*2);
+		cairo_stroke(cairo);
 
 		cairo_set_source_rgba(cairo, 0,1,1,1);
     cairo_move_to (cairo,0,0);
@@ -119,7 +129,9 @@ int main(int argc, char *argv[])
 		gtk_widget_queue_draw(GTK_WIDGET(top));
 		return G_SOURCE_CONTINUE;
 	}
-	update_clock(NULL);
+	// set the initial size...
+	size_to_font(gdk_cairo_create(gtk_widget_get_window(top)));
+	
 	g_timeout_add(100,update_clock,NULL);
 
 	g_signal_connect(top,"destroy",gtk_main_quit,NULL);
