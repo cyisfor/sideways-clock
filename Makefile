@@ -13,7 +13,7 @@ check_d2h:
 $(D2H): check_d2h
 
 gen/%.h: % $(D2H) | gen
-	name=$* $(D2H) $< >$@.temp
+	name=$* $(D2H) <$< >$@.temp
 	mv $@.temp $@
 
 %.o: src/%.c

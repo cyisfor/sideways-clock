@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
 		strtime = timebuf;
 		while(*strtime==' ') ++strtime;
 	}
+	gtk_window_set_keep_above(GTK_WINDOW(top),TRUE);
+	gtk_window_stick(GTK_WINDOW(top));
 	gtk_window_move(GTK_WINDOW(top),0,100);
 	void maybe_resize(gint width, gint height) {
 		static int old_height, old_width, gotit = 0;
