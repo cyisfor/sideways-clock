@@ -60,8 +60,18 @@ int main(int argc, char *argv[])
 		strtime = timebuf;
 		while(*strtime==' ') ++strtime;
 	}
-
 	gtk_window_move(GTK_WINDOW(top),0,100);
+	void maybe_resize(gint width, gint height) {
+		static int old_height, old_width, gotit = 0;
+		if(gotit == 0) {
+			gotit = 1;
+		} else {
+			if(old_height == height && old_width == width) return;
+		} 
+		old_height = height;
+		old_width = width;
+		gtk_window_resize(GTK_WINDOW(top), width, height);
+	}
 	cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
 	cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_BOLD;
 	int size = 18;
@@ -78,12 +88,11 @@ int main(int argc, char *argv[])
 		cairo_set_font_size(cairo,size);
 		cairo_text_extents (cairo, strtime, &te);
 		cairo_set_source_rgba(cairo,1,0,1,1);
-		cairo_rectangle(cairo,0,0,100,100);
-		cairo_stroke(cairo);
 		cairo_rectangle(cairo,0,0,
 										te.height+MARGIN*2,
 										te.width+te.x_bearing+MARGIN*2);
-		gtk_window_resize(GTK_WINDOW(top),
+		// note the height of the text is the width of the window.
+		maybe_resize(
 			 te.height + MARGIN*2,
 			 te.width + te.x_bearing + MARGIN*2);
 
@@ -95,17 +104,6 @@ int main(int argc, char *argv[])
 			cairo_matrix_rotate(&tf, M_PI / 2);
 		}
 		cairo_transform(cairo, &tf);
-
-		cairo_set_source_rgba(cairo,1,0,1,1);
-		double derpx = RADIUS*cos(angle);
-		double derpy = RADIUS*sin(angle);
-		{
-			cairo_rectangle(cairo,0,0,MARGIN,MARGIN);
-			cairo_rectangle(cairo,derpx,derpy,MARGIN,MARGIN);
-			printf("x %lf y %lf\n",derpx,derpy);
-			angle += M_PI / 2 / 10;
-		}
-		cairo_fill(cairo);
 
 		cairo_set_source_rgba(cairo, 0,1,1,1);
     cairo_move_to (cairo,0,0);
